@@ -156,8 +156,8 @@ body.portrait #drawer, body.portrait #title { left: 12px; right: 12px; top: auto
 body.portrait #title { height: auto; min-height: 40vh; }
 body.portrait #tools { flex-direction: column; }
 body.portrait #recent { left: auto; right: 14px; }
-body.portrait #picker { bottom: auto; top: calc(var(--top) + 6px); left: 50%; }
-body.portrait #zoom { left: auto; right: 14px; bottom: calc(42vh + 26px); }
+body.portrait #picker { bottom: calc(42vh + 22px); left: 50%; }
+body.portrait #zoom { left: auto; right: 14px; bottom: calc(42vh + 22px); }
 body.portrait #tapHint { left: 50%; top: 30%; }
 body.portrait #recent { top: calc(var(--top) + 90px); }
 

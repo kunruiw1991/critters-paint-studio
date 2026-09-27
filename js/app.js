@@ -509,7 +509,7 @@ function wearableMesh(id, color) {
       parent = S.C.rig.torso || S.C.root; const T = A.torsoR;
       if (id === 'scarf') { const ring = new THREE.Mesh(new THREE.TorusGeometry(T * 0.8, T * 0.18, 12, 36), mat(color)); ring.rotation.x = Math.PI / 2; g.add(ring); const tail = new THREE.Mesh(new THREE.BoxGeometry(T * 0.3, T * 0.8, T * 0.1), mat(shade(color, -0.12))); tail.position.set(T * 0.35, -T * 0.4, T * 0.75); tail.rotation.z = 0.2; g.add(tail); g.position.copy(A.neck); }
       if (id === 'necklace') { for (let i = 0; i < 18; i++) { const a = (i / 18) * TAU; const p = new THREE.Mesh(new THREE.SphereGeometry(T * 0.06, 10, 8), mat(i % 3 ? '#fffaf0' : color, { roughness: 0.2, metalness: 0.2 })); p.position.set(Math.cos(a) * T * 0.78, -Math.max(0, Math.sin(a)) * T * 0.18, Math.sin(a) * T * 0.78); g.add(p); } g.position.copy(A.neck).add(new THREE.Vector3(0, -T * 0.08, 0)); }
-      if (id === 'cape') { const cape = new THREE.Mesh(new THREE.CylinderGeometry(T * 0.9, T * 1.5, A.torsoH * 2.1, 28, 1, true, Math.PI * 0.62, Math.PI * 0.76), mat(color, { side: THREE.DoubleSide })); cape.position.y = -A.torsoH * 0.95; cape.rotation.y = Math.PI; g.add(cape); g.position.copy(A.neck); }
+      if (id === 'cape') { const cape = new THREE.Mesh(new THREE.CylinderGeometry(T * 0.9, T * 1.5, A.torsoH * 2.1, 28, 1, true, Math.PI * 0.62, Math.PI * 0.76), mat(color, { side: THREE.DoubleSide })); cape.position.y = -A.torsoH * 0.95; g.add(cape); g.position.copy(A.neck); }
       if (id === 'backpack') { const b = new THREE.Mesh(new THREE.BoxGeometry(T * 1.0, A.torsoH * 1.1, T * 0.5), mat(color)); g.add(b); const pocket = new THREE.Mesh(new THREE.BoxGeometry(T * 0.7, A.torsoH * 0.45, T * 0.15), mat(shade(color, -0.2))); pocket.position.set(0, -A.torsoH * 0.2, -T * 0.3); g.add(pocket); g.position.copy(A.back).add(new THREE.Vector3(0, 0, -T * 0.25)); }
       if (id === 'fairywings') {
         [-1, 1].forEach((s) => { const w = new THREE.Mesh(new THREE.CircleGeometry(T * 0.9, 32), new THREE.MeshPhysicalMaterial({ color: shade(color, 0.4), transparent: true, opacity: 0.6, side: THREE.DoubleSide, iridescence: 1, roughness: 0.2 })); w.scale.set(1, 1.4, 1); w.position.set(s * T * 0.8, T * 0.4, 0); w.rotation.z = s * -0.5; w.userData.flap = s; g.add(w); });
@@ -585,9 +585,9 @@ let wiggleT = 0; function wiggle() { wiggleT = 0.6; }
 /* ============================================================ camera / layout */
 function frameCamera() {
   const H = S.C ? S.C.height : 2;
-  const dist = (H * 1.35) / (2 * Math.tan((camera.fov * Math.PI) / 360)) / S.zoom;
-  camera.position.set(0, H * 0.62 + 0.25, dist);
-  camera.lookAt(0, H * 0.46, 0);
+  const dist = (H * 1.85 * (S.fit || 1)) / (2 * Math.tan((camera.fov * Math.PI) / 360)) / S.zoom;
+  camera.position.set(0, H * 0.6 + 0.35, dist);
+  camera.lookAt(0, H * 0.4, 0);
 }
 function setZoom(z) { S.zoom = Math.max(0.8, Math.min(2.4, z)); frameCamera(); }
 function layout() {
@@ -597,9 +597,10 @@ function layout() {
   // centre the plush in the free area (left of the drawer in landscape, above it in portrait)
   const portrait = H > W; document.body.classList.toggle('portrait', portrait);
   const dr = $('drawer').getBoundingClientRect();
-  if (portrait) camera.setViewOffset(W, H, 0, (H - dr.top) / 2 - 20, W, H);
+  S.fit = portrait ? Math.max(1, Math.min(1.5, (H / Math.max(200, dr.top)) * 0.78)) : 1;
+  if (portrait) camera.setViewOffset(W, H, 0, (H - dr.top) / 2 - 10, W, H);
   else camera.setViewOffset(W, H, (W - dr.left) / 2 - 30, 0, W, H);
-  camera.updateProjectionMatrix();
+  camera.updateProjectionMatrix(); frameCamera();
 }
 addEventListener('resize', () => { layout(); });
 
@@ -685,7 +686,7 @@ function surprise() {
   const surfs = C.surfaces, snap = snapshot(surfs);
   const oldFx = C.effects.slice();
   const H = Math.random() * 360, hsl = (h, s, l) => { const c = new THREE.Color().setHSL(((h % 360) + 360) % 360 / 360, s, l); return '#' + c.getHexString(); };
-  const main = hsl(H, 0.62, 0.62), accent = hsl(H + rand(130, 170), 0.7, 0.68), light = hsl(H, 0.65, 0.88), deep = hsl(H + 20, 0.55, 0.42);
+  const main = hsl(H, 0.72, 0.56), accent = hsl(H + rand(130, 170), 0.75, 0.62), light = hsl(H, 0.7, 0.84), deep = hsl(H + 20, 0.6, 0.38);
   const parts = [...C.parts.values()].sort((a, b) => b.area - a.area), seen = new Set();
   const inner = /muzzle|eyePatch|cheek/;
   const pats = ['dots', 'hearts', 'star', 'stripes', 'flower', 'moonstar', 'checkers', 'rainbow', 'strawberry', 'leopard'].map((p) => (p === 'hearts' ? 'heart' : p));
@@ -701,7 +702,7 @@ function surprise() {
     [P, P.mirror].filter(Boolean).forEach((p) => p.surfaces.forEach((s) => paintSurface(s, spec)));
   });
   oldFx.forEach((f) => removeEffect(f, true));
-  const fxPool = PB.EFFECTS.filter((e) => ['twinkle', 'moondust', 'hearts', 'fireflies', 'petals', 'bubbles', 'butterflies', 'rainbowflow'].includes(e.id));
+  const fxPool = PB.EFFECTS.filter((e) => ['twinkle', 'moondust', 'hearts', 'fireflies', 'petals', 'bubbles', 'butterflies', 'notes'].includes(e.id));
   const def = fxPool[Math.random() * fxPool.length | 0];
   const newFx = addEffect(def, parts[Math.min(1, parts.length - 1)]); S.undo.pop();
   pushUndo(() => { restoreSnap(snap); newFx && removeEffect(newFx, true); oldFx.forEach((f) => addEffect(f.def, f.part) && S.undo.pop()); });
@@ -1038,6 +1039,7 @@ function buildStatic() {
 }
 async function enterStudio() {
   S.screen = 'studio'; $('title').classList.add('hidden'); document.body.classList.add('studio');
+  S.spin = ((S.spin % TAU) + TAU) % TAU; if (S.spin > Math.PI) S.spin -= TAU; S.spinVel = 0; S.spinHome = true;
   if (!S.C || S.C.def.id !== S.critterId) await loadCritter(S.critterId);
   layout(); renderPanel(); renderColorChip(); renderRecent(); renderSize();
   music('studio');
@@ -1065,6 +1067,7 @@ function loop(now) {
     if (!ptr || ptr.painting) { S.spinVel *= Math.pow(0.04, dt); S.spin += S.spinVel * (ptr ? 0 : 1) * dt * 20; }
     if (S.screen === 'title') S.spin += dt * 0.25; // slow showcase spin on the title screen
     if (S.finale) S.spin *= Math.pow(0.1, dt);
+    if (S.spinHome) { S.spin *= Math.pow(0.08, dt); if (Math.abs(S.spin) < 0.005 || ptr) S.spinHome = false; }
     turntable.rotation.y = S.spin;
     animateRig(dt); updateEffects(dt); updateLoose(dt); updateFinale(dt);
     if (hintT > 0) { hintT -= dt; if (hintT <= 0) endHint(); }
