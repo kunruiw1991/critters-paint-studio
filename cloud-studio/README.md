@@ -8,3 +8,5 @@ Picture-only cloud sculpting game for CHUYU, KUNRUI and CRAIG.
 - Self-contained `index.html`; no external dependencies.
 
 GitHub Pages path: `/critters-paint-studio/cloud-studio/`.
+
+Play URL: https://kunruiw1991.github.io/critters-paint-studio/cloud-studio/
